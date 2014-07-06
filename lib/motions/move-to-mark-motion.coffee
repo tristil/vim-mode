@@ -22,11 +22,9 @@ class MoveToMark extends MotionWithInput
       @editorView.trigger 'vim-mode:move-to-first-character-of-line'
 
   select: (count=1, {requireEOL}={}) ->
-    markPosition = @vimState.getMark(@input.characters)
-    return [false] unless markPosition?
-    currentPosition = @editor.getCursorBufferPosition()
     selectionRange = null
-    if currentPosition.isGreaterThan(markPosition)
+    markPosition = @vimState.getMark(@input.characters)
+    if @isBackwards()
       if @linewise
         currentPosition = @editor.clipBufferPosition([currentPosition.row, Infinity])
         markPosition = new Point(markPosition.row, 0)
@@ -38,3 +36,9 @@ class MoveToMark extends MotionWithInput
       selectionRange = new Range(currentPosition, markPosition)
     @editor.setSelectedBufferRange(selectionRange, requireEOL: requireEOL)
     [true]
+
+  isBackwards: ->
+    markPosition = @vimState.getMark(@input.characters)
+    return [false] unless markPosition?
+    currentPosition = @editor.getCursorBufferPosition()
+    currentPosition.isGreaterThan(markPosition)

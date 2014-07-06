@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-{$$, Range} = require 'atom'
+{$$, Range, Point} = require 'atom'
 {ViewModel} = require '../view-models/view-model'
 
 class OperatorError
@@ -90,14 +90,32 @@ class Delete extends Operator
       validSelection = true
 
     if validSelection?
+      if @editor.getSelectedText().length > 1 and !@motion.isBackwards() and @motion.selectLastCursorPosition()
+        console.log('_extendSelectedRangeByOne')
+        @_extendSelectedRangeByOne()
+
+      console.log('@editor.delete')
       @editor.delete()
       if !@allowEOL and cursor.isAtEndOfLine() and !@motion.isLinewise?()
         @editor.moveCursorLeft()
 
-    if @motion.isLinewise?()
-      @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
+      if @motion.isLinewise?()
+        @editor.setCursorScreenPosition([cursor.getScreenRow(), 0])
 
-    @vimState.activateCommandMode()
+      @editor.getSelection().clear()
+      @vimState.activateCommandMode()
+
+  # Private: Make the selection one larger to the right when deleting
+  _extendSelectedRangeByOne: ->
+    currentRange = @editor.getSelectedBufferRange()
+    newRangeStart = currentRange.start.copy()
+    newRangeEnd = new Point(currentRange.end.row, currentRange.end.column + 1)
+    newRange = new Range(newRangeStart, newRangeEnd)
+    prospectiveSelection = @editor.getTextInBufferRange(new Range(newRangeStart, newRangeEnd))
+    if prospectiveSelection.slice(-1) == ' ' and @selectOptions.excludeWhitespace
+      return
+    @editor.setSelectedBufferRange(newRange)
+
 #
 # It toggles the case of everything selected by the following motion
 #

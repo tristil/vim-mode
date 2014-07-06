@@ -45,6 +45,8 @@ class Find extends MotionWithInput
       return [true]
     [false]
 
+  isBackwards: -> @reversed
+
 class Till extends Find
   constructor: (@editorView, @vimState) ->
     super(@editorView, @vimState)

@@ -10,7 +10,7 @@ class SearchBase extends MotionWithInput
     super(@editorView, @vimState)
     Search.currentSearch = @
     @reverse = @initiallyReversed = false
-
+ 
   repeat: (opts = {}) =>
     reverse = opts.backwards
     if @initiallyReversed and reverse
@@ -76,6 +76,8 @@ class SearchBase extends MotionWithInput
     after = after.reverse() if @reverse
 
     @matches = after
+
+  isBackwards: -> @reversed()
 
 class Search extends SearchBase
   constructor: (@editorView, @vimState) ->

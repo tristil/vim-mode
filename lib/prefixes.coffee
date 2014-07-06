@@ -26,6 +26,9 @@ class Prefix
   select: ->
     @composedObject.select?(@count)
 
+  isBackwards: -> false
+  selectLastCursorPosition: -> true
+
 #
 # Used to track the number of times either a motion or operator should
 # be repeated.

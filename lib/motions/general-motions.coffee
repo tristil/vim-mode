@@ -12,6 +12,8 @@ class Motion
   isComplete: -> true
   isRecordable: -> false
   inVisualMode: -> @vimState.mode == "visual"
+  isBackwards: -> false
+  selectLastCursorPosition: -> true
 
 class CurrentSelection extends Motion
   execute: (count=1) ->
@@ -53,6 +55,8 @@ class MoveLeft extends Motion
         true
       else
         false
+
+  isBackwards: -> true
 
 class MoveRight extends Motion
   execute: (count=1) ->
@@ -159,6 +163,8 @@ class MoveUp extends MoveVertically
       @editor.selectUp()
       true
 
+  isBackwards: -> true
+
 class MoveDown extends MoveVertically
   # Internal: The direction to move the cursor. Use -1
   # for moving up, 1 for moving down.
@@ -183,6 +189,8 @@ class MoveToPreviousWord extends Motion
       @editor.selectToBeginningOfWord()
       true
 
+  isBackwards: -> true
+
 class MoveToPreviousWholeWord extends Motion
   execute: (count=1) ->
     _.times count, =>
@@ -202,6 +210,8 @@ class MoveToPreviousWholeWord extends Motion
   isBeginningOfFile: ->
     cur = @editor.getCursorBufferPosition();
     not cur.row and not cur.column
+
+  isBackwards: -> true
 
 class MoveToNextWord extends Motion
   execute: (count=1) ->
@@ -242,6 +252,8 @@ class MoveToNextWord extends Motion
     cur = @editor.getCursor().getBufferPosition()
     eof = @editor.getEofBufferPosition()
     cur.row is eof.row and cur.column is eof.column
+
+  selectLastCursorPosition: -> false
 
 class MoveToNextWholeWord extends Motion
   execute: (count=1) ->
@@ -391,6 +403,8 @@ class MoveToPreviousParagraph extends Motion
         stop()
     @editor.screenPositionForBufferPosition(position)
 
+  isBackwards: -> true
+
 class MoveToLine extends Motion
   isLinewise: -> true
 
@@ -450,6 +464,8 @@ class MoveToBeginningOfLine extends Motion
       @editor.selectToBeginningOfLine()
       true
 
+  isBackwards: -> true
+
 class MoveToFirstCharacterOfLine extends Motion
   constructor:(@editor, @vimState) ->
     @cursor = @editor.getCursor()
@@ -466,6 +482,8 @@ class MoveToFirstCharacterOfLine extends Motion
 
   getDestinationColumn: ->
     @editor.lineForBufferRow(@cursor.getBufferRow()).search(/\S/)
+
+  isBackwards: -> true
 
 class MoveToLastCharacterOfLine extends Motion
   execute: (count=1) ->
@@ -518,7 +536,10 @@ class MoveToStartOfFile extends MoveToLine
     bufferRange = new Range([row, startingCol], [destinationRow, destinationCol])
     @editor.setSelectedBufferRange(bufferRange, reversed: true)
 
+  isBackwards: -> true
+
 class MoveToTopOfScreen extends MoveToScreenLine
+
   getDestinationRow: (count=0) ->
     firstScreenRow = @editorView.getFirstVisibleScreenRow()
     if firstScreenRow > 0
@@ -526,6 +547,8 @@ class MoveToTopOfScreen extends MoveToScreenLine
     else
       offset = if count > 0 then count - 1 else count
     firstScreenRow + offset
+
+  isBackwards: -> true
 
 class MoveToBottomOfScreen extends MoveToScreenLine
   getDestinationRow: (count=0) ->

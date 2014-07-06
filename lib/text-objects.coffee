@@ -3,6 +3,8 @@ class TextObject
 
   isComplete: -> true
   isRecordable: -> false
+  isBackwards: -> false
+  selectLastCursorPosition: -> true
 
 class SelectInsideWord extends TextObject
   select: ->

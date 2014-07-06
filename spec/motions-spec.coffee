@@ -934,7 +934,7 @@ describe "Motions", ->
         editor.commandModeInputView.editor.trigger 'core:confirm'
         expect(editor.getCursorBufferPosition()).toEqual [0, 8]
         keydown('d')
-        expect(editor.getText()).toBe 'three'
+        expect(editor.getText()).toBe 'hree'
 
       it 'extends selection when repeating search in visual mode', ->
         editor.setText('line1\nline2\nline3')
